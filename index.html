@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vault Place | Official Imperial Gaming</title>
+    <title>Vault Palace | Imperial VIP Hub</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -14,161 +14,188 @@
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background: #050505; color: #fff; 
-            background-image: radial-gradient(circle at top right, rgba(176,141,87,0.1), transparent), 
-                              linear-gradient(rgba(0,0,0,0.97), rgba(0,0,0,0.97)), 
-                              url('https://images.unsplash.com/photo-1518623489648-a173ef7824f3?q=80&w=2000');
-            background-attachment: fixed; background-size: cover;
+            background-image: radial-gradient(circle at top, #1e1b4b, #050505);
+            background-attachment: fixed;
         }
 
         .luxury-font { font-family: 'Playfair Display', serif; }
-        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(40px); border: 1px solid rgba(255,255,255,0.05); }
+        .glass-header { background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(25px); border-bottom: 2px solid var(--gold); }
         .gold-gradient { background: linear-gradient(135deg, #b08d57 0%, #edcf9d 50%, #b08d57 100%); }
         .gold-text { background: linear-gradient(135deg, #b08d57 0%, #edcf9d 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        /* Sidebar Logic */
-        .sidebar { 
-            position: fixed; inset-y: 0; right: -100%; width: 100%; max-width: 450px; 
-            background: #080808; transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1); 
-            z-index: 9000; border-left: 1px solid var(--gold); backdrop-filter: blur(20px);
+        /* High-Highlight Form Styling */
+        .form-highlight { 
+            background: rgba(8, 8, 8, 0.98); 
+            border: 2px solid var(--gold); 
+            box-shadow: 0 0 60px rgba(176, 141, 87, 0.5);
         }
-        .sidebar.active { right: 0 !important; }
-
-        /* Splash Screen */
-        #splash {
-            position: fixed; inset: 0; background: #000; z-index: 10000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        .input-label { color: var(--gold-light); font-weight: 900; text-transform: uppercase; font-size: 10px; letter-spacing: 2px; margin-bottom: 8px; display: block; text-shadow: 0 0 5px rgba(176, 141, 87, 0.3); }
+        
+        .profile-accent { 
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            height: 1.5px; width: 100%; max-width: 250px; margin-top: 6px;
         }
 
-        /* Flush Grid (2x3 Mobile) */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 9500; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(20px); }
+        
+        /* Input Styling */
+        input, select, textarea { 
+            background: rgba(255,255,255,0.07) !important; 
+            border: 1px solid rgba(176,141,87,0.4) !important; 
+            color: white !important; 
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--gold) !important; background: rgba(255,255,255,0.12) !important; box-shadow: 0 0 15px rgba(176,141,87,0.4); }
+
         .flush-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; border: 1px solid rgba(255,255,255,0.05); }
-        .game-card { border: 0.5px solid rgba(255,255,255,0.05); background: rgba(10,10,10,0.5); position: relative; overflow: hidden; }
-
+        .game-card { border: 0.5px solid rgba(255,255,255,0.1); background: rgba(10,10,10,0.4); position: relative; overflow: hidden; cursor: pointer; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .king-glow { box-shadow: 0 0 20px rgba(176,141,87,0.6); border: 2.5px solid var(--gold); }
+        .king-glow { box-shadow: 0 0 30px #b08d57; border: 2.5px solid #b08d57; }
         
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.94); z-index: 9500; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(15px); }
-        
-        /* Login Modal */
-        #login-modal { position: fixed; inset: 0; z-index: 11000; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        #splash { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body class="overflow-x-hidden">
 
-    <!-- Splash Screen -->
     <div id="splash">
-        <h1 class="text-6xl font-black italic gold-text luxury-font">Vault Place</h1>
-        <p class="text-[9px] tracking-[8px] text-gray-500 mt-6 uppercase">Loading Imperial Hub</p>
-    </div>
-
-    <!-- Admin Login Modal -->
-    <div id="login-modal">
-        <div class="glass p-10 rounded-[3rem] w-[85%] max-w-xs text-center border-white/10 shadow-2xl">
-            <h2 class="gold-text font-black mb-6 uppercase tracking-widest text-xs">Access Key Required</h2>
-            <input type="password" id="admin-pass-field" placeholder="Enter Code" class="w-full bg-white/5 p-4 rounded-2xl mb-4 text-center border border-white/10 outline-none text-white">
-            <div class="flex gap-2">
-                <button onclick="closeLogin()" class="flex-1 text-gray-500 text-[10px] font-black uppercase">Cancel</button>
-                <button onclick="verifyAdmin()" class="flex-1 gold-gradient text-black py-3 rounded-xl font-black text-[10px] uppercase">Unlock</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Floating Contacts -->
-    <div class="fixed bottom-6 left-6 z-[4000] flex flex-col gap-3">
-        <a href="https://m.me/61584206122374" target="_blank" class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center shadow-2xl transition hover:scale-110">
-            <svg width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.145 2 11.258c0 2.915 1.454 5.518 3.733 7.234V22l3.328-1.827c.903.25 1.87.385 2.939.385 5.523 0 10-4.145 10-9.258C22 6.145 17.523 2 12 2zm1.096 12.392l-2.574-2.748-5.026 2.748 5.526-5.87 2.653 2.748 4.947-2.748-5.526 5.87z"/></svg>
-        </a>
-        <a href="https://wa.me/447473019909" target="_blank" class="w-14 h-14 bg-green-600 rounded-full flex items-center justify-center shadow-2xl transition hover:scale-110">
-            <svg width="30" height="30" fill="white" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.588-5.946 0-6.556 5.332-11.891 11.891-11.891 3.181 0 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.481 8.403 0 6.556-5.332 11.89-11.891 11.89-2.003 0-3.976-.505-5.717-1.46l-6.276 1.679zm6.115-4.636c1.614.959 3.125 1.441 4.737 1.441 5.057 0 9.171-4.114 9.171-9.171 0-2.449-.953-4.752-2.683-6.483-1.73-1.73-4.032-2.683-6.488-2.683-5.056 0-9.17 4.114-9.17 9.171 0 1.742.493 3.333 1.42 4.743l-1.065 3.889 4.078-1.092z"/></svg>
-        </a>
+        <h1 class="text-6xl font-black italic gold-text luxury-font animate-pulse uppercase">Vault Palace</h1>
+        <p class="text-[9px] tracking-[10px] text-gray-400 mt-4 uppercase font-bold text-center">Imperial Gaming Hub</p>
     </div>
 
     <div id="main-content" class="hidden">
-        <!-- Header -->
-        <header class="sticky top-0 z-[1000] glass px-6 py-4 flex justify-between items-center shadow-2xl border-b border-white/5">
-            <div class="flex items-center gap-4">
-                <div class="relative cursor-pointer" onclick="showLogin()">
-                    <!-- Always Dynamic Facebook Profile Pic Integration -->
-                    <div class="w-14 h-14 rounded-full king-glow overflow-hidden">
-                        <img src="https://graph.facebook.com/100063604085449/picture?type=large" onerror="this.src='https://ui-avatars.com/api/?name=V&background=b08d57&color=000&bold=true'" class="w-full h-full object-cover">
-                    </div>
-                    <div class="absolute -top-3 -right-2 text-2xl">👑</div>
+        <header class="sticky top-0 z-[1000] glass-header px-6 py-8 shadow-2xl flex flex-col items-center justify-center">
+            <div class="relative mb-4">
+                <div class="w-20 h-20 rounded-full king-glow overflow-hidden">
+                    <img src="https://graph.facebook.com/100063604085449/picture?type=large" onerror="this.src='https://ui-avatars.com/api/?name=Vault+Palace&background=b08d57&color=000&bold=true'" class="w-full h-full object-cover">
                 </div>
-                <div>
-                    <h1 class="text-xl md:text-2xl font-black gold-text luxury-font italic leading-none">Vault Place</h1>
-                    <div class="flex gap-2 mt-1">
-                        <a href="https://www.facebook.com/share/16XA4jYBqe/" target="_blank" class="opacity-70"><svg width="12" height="12" fill="#1877F2" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
-                        <span class="text-[7px] text-green-500 font-bold uppercase tracking-widest">● Support Online</span>
-                    </div>
-                </div>
+                <div class="absolute -top-4 -right-2 text-3xl animate-bounce">👑</div>
             </div>
-
-            <button onclick="showPolicy('cashout')" class="px-4 py-2 gold-gradient rounded-xl shadow-lg active:scale-90 transition">
-                <span class="text-[9px] font-black text-black uppercase tracking-widest italic">Rules</span>
-            </button>
+            <h1 class="text-3xl font-black gold-text luxury-font italic leading-none tracking-tighter uppercase text-center">Vault Palace</h1>
+            <div class="profile-accent"></div>
+            <span class="text-[7px] text-green-400 font-black uppercase tracking-[5px] mt-4">● Imperial Support Online</span>
         </header>
 
-        <!-- Bonus Banner -->
-        <div class="bg-white/5 py-2 px-6 flex justify-around text-[8px] font-black uppercase tracking-widest text-[#edcf9d] border-b border-white/5">
-            <span>🎁 Sign-Up: 100%</span>
-            <span>🔄 Regular: 40%</span>
-            <span>🤝 Referral: 50%</span>
+        <!-- Jackpot Bar -->
+        <div class="bg-black/80 py-3 border-b border-gold/30 flex items-center justify-center gap-4">
+            <span class="text-[9px] font-black text-red-500 animate-pulse uppercase italic">Jackpot:</span>
+            <span id="jackpot" class="text-xl font-black gold-text luxury-font tracking-widest">$24,982.45</span>
         </div>
 
-        <!-- Flush Game Grid (2x3 Style) -->
-        <main id="grid" class="flush-grid lg:grid-cols-4 max-w-7xl mx-auto pb-40 border border-white/5"></main>
-
-        <footer class="p-16 border-t border-white/5 bg-black/95 text-center relative">
-            <h3 class="gold-text luxury-font italic text-2xl mb-4">Official Vault Support</h3>
-            <p class="text-gray-500 text-[10px] mb-8 uppercase tracking-[3px]">IDs are manually setup by support for maximum security</p>
-            
-            <div class="flex flex-wrap justify-center gap-4 mb-12">
-                <a href="https://wa.me/447473019909" target="_blank" class="gold-gradient px-8 py-3 rounded-full text-[10px] font-black uppercase text-black">WhatsApp Chat</a>
-                <button onclick="showPolicy('freeplay')" class="glass px-8 py-3 rounded-full text-[10px] font-bold uppercase text-gold">Freeplay Rules</button>
+        <div class="px-6 py-6">
+            <div class="max-w-xl mx-auto glass p-1 rounded-2xl border border-gold flex items-center px-4">
+                <span class="text-lg opacity-40 mr-2">🔍</span>
+                <input type="text" id="gameSearch" oninput="render()" placeholder="Search Imperial Vaults..." class="w-full bg-transparent border-none py-3 text-sm italic text-white outline-none">
             </div>
-            
-            <p class="text-[8px] tracking-[5px] text-gray-600 font-bold uppercase">Crafted by Fawad Designer Studio © 2025</p>
-            <button onclick="showLogin()" class="mt-8 opacity-5">🔒</button>
-        </footer>
+        </div>
+
+        <main id="grid" class="flush-grid lg:grid-cols-4 max-w-7xl mx-auto pb-48 border-t border-gold/20"></main>
+
+        <!-- Bottom Bar -->
+        <div class="fixed bottom-0 inset-x-0 glass-header border-t border-gold flex justify-around items-center py-4 z-[4000] px-4">
+            <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="flex flex-col items-center gap-1 opacity-70">
+                <span class="text-xl">🏠</span><span class="text-[7px] font-black uppercase tracking-widest text-white">Home</span>
+            </button>
+            <button onclick="showPolicy('cashout')" class="flex flex-col items-center gap-1 opacity-70">
+                <span class="text-xl">📜</span><span class="text-[7px] font-black uppercase tracking-widest text-white">Policy</span>
+            </button>
+            <a href="https://wa.me/447473019909" class="flex items-center justify-center p-4 rounded-full bg-green-600 -mt-12 shadow-[0_0_25px_#22c55e] border-4 border-[#050505] active:scale-90 transition">
+                <svg width="28" height="28" fill="white" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.588-5.946 0-6.556 5.332-11.891 11.891-11.891 3.181 0 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.481 8.403 0 6.556-5.332 11.89-11.891 11.89-2.003 0-3.976-.505-5.717-1.46l-6.276 1.679zm6.115-4.636c1.614.959 3.125 1.441 4.737 1.441 5.057 0 9.171-4.114 9.171-9.171 0-2.449-.953-4.752-2.683-6.483-1.73-1.73-4.032-2.683-6.488-2.683-5.056 0-9.17 4.114-9.17 9.171 0 1.742.493 3.333 1.42 4.743l-1.065 3.889 4.078-1.092z"/></svg>
+            </a>
+            <button onclick="showPolicy('freeplay')" class="flex flex-col items-center gap-1 opacity-70">
+                <span class="text-xl">🎁</span><span class="text-[7px] font-black uppercase tracking-widest text-white">Freeplay</span>
+            </button>
+            <a href="https://m.me/61584206122374" target="_blank" class="flex flex-col items-center gap-1 opacity-70">
+                <span class="text-xl">💬</span><span class="text-[7px] font-black uppercase tracking-widest text-white">Messenger</span>
+            </a>
+        </div>
     </div>
 
-    <!-- POLICY MODALS -->
+    <!-- ID SETUP FORM MODAL -->
+    <div id="form-modal" class="modal-overlay" onclick="closeFormModal()">
+        <div class="form-highlight max-w-lg w-full p-8 md:p-10 rounded-[3rem] overflow-hidden" onclick="event.stopPropagation()">
+            <div class="text-center mb-8 border-b border-gold/20 pb-4">
+                <h2 class="text-4xl luxury-font gold-text italic font-black uppercase tracking-tighter leading-none">ID Setup</h2>
+                <p class="text-[9px] text-gray-400 mt-3 uppercase tracking-[5px] font-bold italic">Dear Player, Provide Details</p>
+            </div>
+            
+            <div class="space-y-5">
+                <div>
+                    <label class="input-label">Full Name</label>
+                    <input type="text" id="f-name" placeholder="Name for billing" class="w-full p-4 rounded-2xl text-sm">
+                </div>
+
+                <div>
+                    <label class="input-label">Desired Username</label>
+                    <input type="text" id="f-user" placeholder="Login Name" class="w-full p-4 rounded-2xl text-sm">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="input-label">Deposit ($)</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gold font-black">$</span>
+                            <input type="number" id="f-amount" placeholder="0.00" class="w-full p-4 pl-8 rounded-2xl text-sm font-bold">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="input-label">Player Status</label>
+                        <select id="f-status" class="w-full p-4 rounded-2xl text-sm font-bold cursor-pointer">
+                            <option value="New Player">New Player</option>
+                            <option value="Active Player">Active Player</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="input-label">Payment Method</label>
+                    <select id="f-payment" class="w-full p-4 rounded-2xl text-sm font-bold cursor-pointer">
+                        <option value="" disabled selected>Choose Method</option>
+                        <option value="Cash App">Cash App</option><option value="Chime">Chime</option><option value="Apple Pay">Apple Pay</option><option value="Zelle">Zelle</option><option value="Stripe">Stripe</option><option value="Venmo">Venmo</option>
+                    </select>
+                </div>
+
+                <!-- OPTIONAL MESSAGE BOX -->
+                <div>
+                    <label class="input-label">Note / Special Request (Optional)</label>
+                    <textarea id="f-msg" rows="2" placeholder="Anything else you want to tell us?" class="w-full p-4 rounded-2xl text-sm resize-none"></textarea>
+                </div>
+
+                <div class="bg-gold/5 p-4 rounded-2xl border border-gold/20 flex justify-between items-center">
+                    <span class="input-label !mb-0 text-gold-light">Vault:</span>
+                    <input type="text" id="f-vault" class="bg-transparent border-none p-0 text-white font-black italic uppercase text-sm text-right w-1/2 outline-none" readonly>
+                </div>
+
+                <button onclick="submitIdForm()" class="w-full gold-gradient py-5 rounded-3xl font-black uppercase text-xs tracking-widest text-black shadow-[0_0_25px_rgba(176,141,87,0.5)] mt-2 active:scale-95 transition-all">
+                    Finalize & Create Account
+                </button>
+            </div>
+            <button onclick="closeFormModal()" class="w-full mt-4 text-gray-500 text-[10px] font-black uppercase tracking-widest hover:text-white transition">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Policy Modal -->
     <div id="policy-modal" class="modal-overlay" onclick="closePolicy()">
-        <div class="glass max-w-lg w-full p-10 rounded-[3rem] border border-gold/30" onclick="event.stopPropagation()">
-            <h2 id="policy-title" class="text-3xl luxury-font gold-text italic text-center mb-8">Policy</h2>
-            <div id="policy-content" class="text-[11px] text-gray-300 leading-relaxed space-y-4"></div>
-            <button onclick="closePolicy()" class="w-full mt-10 gold-gradient py-3 rounded-2xl font-black text-black text-xs uppercase tracking-widest">I Understand</button>
+        <div class="glass max-w-lg w-full p-10 rounded-[3rem] border border-gold/30 shadow-2xl" onclick="event.stopPropagation()">
+            <h2 id="policy-title" class="text-3xl luxury-font gold-text italic text-center mb-8 uppercase font-black tracking-widest">Policy</h2>
+            <div id="policy-content" class="text-[11px] text-gray-300 leading-relaxed"></div>
+            <button onclick="closePolicy()" class="mt-8 gold-gradient w-full py-3 rounded-2xl font-black text-black text-xs uppercase tracking-widest">Close</button>
         </div>
     </div>
 
     <script>
-        const MASTER_KEY = "786";
         const WA_PHONE = "447473019909";
+        let currentSelectedSymbol = "";
 
-        // ALL 30+ GAMES LIST INTEGRATED
         const gameData = [
-            { name: "Cash Frenzy", symbol: "CF", link: "https://www.cashfrenzy777.com/m", img: "https://i.ibb.co/Cs2Vmydd/game-promo-cash-frenzy.png" },
-            { name: "Casino Ignite", symbol: "CL", link: "https://download.casinoignitee.vip/", img: "https://i.ibb.co/xqcdNStS/game-promo-casino-ignite-1767459552622.png" },
-            { name: "E Game", symbol: "E", link: "https://www.egame99.club", img: "https://i.ibb.co/1t3V7XSC/game-promo-e-game-1767459607868.png" },
-            { name: "Fire Kirin", symbol: "F", link: "https://firekirin.com/download-fire-kirin-app.html", img: "https://i.ibb.co/XrwzwM1q/game-promo-fire-kirin-1767459646440.png" },
-            { name: "Game Room", symbol: "G", link: "https://www.gameroom777.com/", img: "https://i.ibb.co/5xkN00b8/game-promo-game-room-1767459673408.png" },
-            { name: "Game Vault 999", symbol: "V", link: "https://download.gamevault999.com/", img: "https://i.ibb.co/yFXRMmZb/game-promo-game-vault-999-1767459708463.png" },
-            { name: "Gem 77777", symbol: "GM", link: "https://www.gem77777.com/", img: "https://i.ibb.co/LzV3Jyps/game-promo-gem-77777-1767459741136.png" },
-            { name: "Juwa", symbol: "J", link: "https://juwa777.com/", img: "https://i.ibb.co/Wvz00cP3/game-promo-juwa.png" },
-            { name: "King Kong", symbol: "KK", link: "https://pandamaster.com/app/", img: "https://i.ibb.co/fV3g1fv5/game-promo-king-kong-1767459770630.png" },
-            { name: "Lucky Stars", symbol: "S", link: "http://playgdt.com", img: "https://i.ibb.co/7JdPmYmz/game-promo-lucky-stars-1767459797785.png" },
-            { name: "Mafia", symbol: "A", link: "http://www.mafia77777.com", img: "https://i.ibb.co/0jfY55Lr/game-promo-mafia-1767459820568.png" },
-            { name: "Milky Way", symbol: "M", link: "https://milkywayapp.xyz/", img: "https://i.ibb.co/Kj0grG9T/Milky-Way-promo-1.png" },
-            { name: "Mr All in One", symbol: "A1", link: "https://www.mrallinone777.com", img: "https://i.ibb.co/pjsjH54R/game-promo-mr-all-in-one-1767459987202.png" },
-            { name: "Noble", symbol: "N", link: "http://www.noble777.com", img: "https://i.ibb.co/7dXLfPnY/game-promo-noble-1767460012074.png" },
-            { name: "Orion Stars", symbol: "O", link: "https://orionstarsonline.com/", img: "https://i.ibb.co/chdFLjpJ/game-promo-orion-stars-1767460037839.png" },
-            { name: "Panda Master", symbol: "PM", link: "https://pandamaster.com/app/", img: "https://i.ibb.co/4n5FG52M/game-promo-panda-master-1767460059705.png" },
-            { name: "River Sweep", symbol: "RS", link: "https://bet777.eu/play/", img: "https://i.ibb.co/4RtnKZVq/game-promo-rivers-sweeps-1767460079774.png" },
-            { name: "Ultra Panda", symbol: "U", link: "http://www.ultrapanda.mobi", img: "https://i.ibb.co/cXw7fTBh/game-promo-ultra-panda-1767460098325.png" },
-            { name: "V Blink", symbol: "B", link: "https://www.vblink777.club/", img: "https://i.ibb.co/N2hZngdc/game-promo-v-blink-1767460129924.png" },
-            { name: "Cash Machine", symbol: "H", link: "https://www.cashmachine777.com", img: "https://i.ibb.co/JwWWhLrh/game-promo-cash-machine-1767460148719.png" },
-            { name: "Win Star", symbol: "W", link: "https://www.winstar99999.com", img: "https://i.ibb.co/1fS7HgXW/game-promo-win-stars-1767460166009.png" },
-            { name: "Yolo 777", symbol: "Y7", link: "https://yolo777.game", img: "https://i.ibb.co/BH6LGWXQ/game-promo-yolo-777-1767460185624.png" },
-            // All other games will use same style logic...
+            { name: "Blue Dragon", symbol: "BD", img: "https://i.ibb.co/chdFLjpJ/game-promo-orion-stars-1767460037839.png" },
+            { name: "Cash Machine", symbol: "H", img: "https://i.ibb.co/JwWWhLrh/game-promo-cash-machine-1767460148719.png" },
+            { name: "Juwa 2.0", symbol: "J", img: "https://i.ibb.co/Wvz00cP3/game-promo-juwa.png" },
+            { name: "Casino Royal", symbol: "CR", img: "https://i.ibb.co/xqcdNStS/game-promo-casino-ignite-1767459552622.png" },
+            { name: "Fire Kirin", symbol: "F", img: "https://i.ibb.co/XrwzwM1q/game-promo-fire-kirin-1767459646440.png" },
+            { name: "Game Vault 999", symbol: "V", img: "https://i.ibb.co/yFXRMmZb/game-promo-game-vault-999-1767459708463.png" },
+            { name: "Gem 77777", symbol: "GM", img: "https://i.ibb.co/LzV3Jyps/game-promo-gem-77777-1767459741136.png" },
+            { name: "Panda Master", symbol: "PM", img: "https://i.ibb.co/4n5FG52M/game-promo-panda-master-1767460059705.png" }
         ];
 
         window.onload = () => {
@@ -177,130 +204,58 @@
                 document.getElementById('main-content').classList.remove('hidden');
                 document.getElementById('main-content').style.opacity = '1';
                 render();
+                startJackpot();
             }, 1800);
         };
 
         function render() {
             const grid = document.getElementById('grid');
-            grid.innerHTML = gameData.map(g => `
-                <div class="game-card flex flex-col group overflow-hidden">
-                    <div class="h-64 md:h-80 overflow-hidden relative">
-                        <img src="${g.img}" class="w-full h-full object-cover transition duration-1000 group-hover:scale-110 opacity-60">
-                        <div class="absolute bottom-4 left-4 bg-black/90 backdrop-blur-xl px-4 py-1.5 rounded-lg text-[14px] font-black text-[#edcf9d] border border-white/5 uppercase">${g.symbol}</div>
+            const search = document.getElementById('gameSearch').value.toLowerCase();
+            const filtered = gameData.filter(g => g.name.toLowerCase().includes(search));
+            
+            grid.innerHTML = filtered.map(g => `
+                <div class="game-card flex flex-col group" onclick="openFormModal('${g.name}', '${g.symbol}')">
+                    <div class="h-60 md:h-80 overflow-hidden relative">
+                        <img src="${g.img}" class="w-full h-full object-cover transition duration-1000 group-hover:scale-110 opacity-70">
+                        <div class="absolute bottom-4 left-4 bg-black/90 backdrop-blur-xl px-4 py-1.5 rounded-lg text-[14px] font-black text-[#edcf9d] border border-white/5 uppercase shadow-xl">${g.symbol}</div>
                     </div>
-                    <div class="p-6 flex-grow bg-white/[0.01] border-t border-white/5 flex flex-col justify-between text-center">
+                    <div class="p-6 flex-grow bg-white/[0.02] border-t border-gold/10 text-center flex flex-col justify-between">
                         <h3 class="text-[13px] font-black uppercase text-gray-200 italic tracking-tighter">${g.name}</h3>
-                        <div class="mt-4 flex flex-col gap-2">
-                            <a href="${g.link}" target="_blank" class="glass py-2 rounded-lg text-[9px] font-bold uppercase hover:bg-white/5">Official Link</a>
-                            <a href="https://wa.me/${WA_PHONE}?text=Hello%20Vault%20Place,%20I%20want%20to%20setup%20my%20ID%20for%20${g.name}" target="_blank" 
-                               class="gold-gradient py-2 rounded-lg text-[10px] font-black uppercase text-black shadow-lg transition active:scale-95">Get ID Now</a>
-                        </div>
+                        <div class="mt-4"><button class="gold-gradient w-full py-2 rounded-lg text-[10px] font-black uppercase text-black shadow-lg">Get ID</button></div>
                     </div>
                 </div>`).join('');
         }
 
+        function openFormModal(name, sym) {
+            currentSelectedSymbol = sym;
+            document.getElementById('f-vault').value = `${name} (${sym})`;
+            document.getElementById('form-modal').style.display = 'flex';
+        }
+
+        function closeFormModal() { document.getElementById('form-modal').style.display = 'none'; }
+
+        function submitIdForm() {
+            const n = document.getElementById('f-name').value, uRaw = document.getElementById('f-user').value, a = document.getElementById('f-amount').value, s = document.getElementById('f-status').value, p = document.getElementById('f-payment').value, v = document.getElementById('f-vault').value, note = document.getElementById('f-msg').value;
+
+            if(!n || !uRaw || !a || !p) return alert("All Details required!");
+
+            const finalID = uRaw + "P" + currentSelectedSymbol;
+            const noteText = note ? note : "None";
+
+            const msg = `*NEW ACCOUNT SETUP*%0A%0A*Name:* ${n}%0A*Imperial ID:* ${finalID}%0A*Deposit:* $${a}%0A*Method:* ${p}%0A*Vault:* ${v}%0A*Status:* ${s}%0A*Player Note:* ${noteText}%0A%0A_Process setup now._`;
+            
+            window.open(`https://wa.me/${WA_PHONE}?text=${msg}`);
+            closeFormModal();
+        }
+
         const policies = {
-           cashout: `
-    <div class='bg-white/5 p-5 rounded-[2rem] mb-6 border border-gold/30 text-center'>
-        <p class='font-black text-gold uppercase tracking-widest text-[10px] mb-1'>Minimum Deposit</p>
-        <p class='text-white text-3xl font-black italic luxury-font'>$10.00</p>
-    </div>
-
-    <div class='space-y-4 text-left'>
-        <!-- Tier 1 -->
-        <div class='bg-white/5 p-4 rounded-2xl border border-white/5'>
-            <p class='font-black text-gold text-[11px] mb-2 uppercase tracking-wider'>1. Deposit $10 to $19</p>
-            <div class='flex justify-between text-gray-300 text-sm'>
-                <span>Minimum: <b class='text-white'>$60</b></span>
-                <span>Maximum: <b class='text-white'>$80</b></span>
-            </div>
-        </div>
-
-        <!-- Tier 2 -->
-        <div class='bg-white/5 p-4 rounded-2xl border border-white/5'>
-            <p class='font-black text-gold text-[11px] mb-2 uppercase tracking-wider'>2. Deposit $20 to $50</p>
-            <div class='flex justify-between text-gray-300 text-sm'>
-                <span>Minimum: <b class='text-white'>4X</b></span>
-                <span>Maximum: <b class='text-white'>6X</b></span>
-            </div>
-        </div>
-
-        <!-- Tier 3 -->
-        <div class='bg-white/5 p-4 rounded-2xl border border-gold/20 shadow-lg shadow-gold/5'>
-            <p class='font-black text-gold text-[11px] mb-2 uppercase tracking-wider'>3. Deposit $50 or more</p>
-            <div class='flex justify-between text-gray-300 text-sm'>
-                <span>Minimum: <b class='text-white'>4X</b></span>
-                <span>Maximum: <b class='text-white'>6X (Up to $2500)</b></span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Notes Section -->
-    <div class='mt-8 pt-6 border-t border-white/10 text-left'>
-        <p class='font-black gold-text uppercase text-[10px] mb-4 tracking-[3px] italic'>Important Notes:</p>
-        <ul class='space-y-3 text-[10px] text-gray-400 leading-relaxed'>
-            <li class='flex gap-3'><span class='text-gold font-bold'>1.</span> <span>No refund policy under any circumstances.</span></li>
-            <li class='flex gap-3'><span class='text-gold font-bold'>2.</span> <span>No cash-out after 24 hours of deposit.</span></li>
-            <li class='flex gap-3'><span class='text-gold font-bold'>3.</span> <span>Extra amount will be voided and your account will be reset to zero after cash-out.</span></li>
-            <li class='flex gap-3'><span class='text-gold font-bold'>4.</span> <span>Minimum deposit is $10. Deposits under $10 will receive <b>No Bonus</b> and Freeplay Policy will apply.</span></li>
-        </ul>
-    </div>
-
-    <p class='mt-8 text-center luxury-font gold-text italic font-black text-lg tracking-widest'>Thank you.</p>
-`,
-            freeplay: `
-    <div class='text-center mb-8'>
-        <h3 class='luxury-font gold-text text-2xl italic font-black mb-2'>Dear Player</h3>
-        <p class='text-[10px] text-gray-500 uppercase tracking-[3px] font-bold'>These Are The Rules For Redumption Of Freeplay</p>
-    </div>
-
-    <div class='space-y-6 text-left'>
-        <!-- Step 1 -->
-        <div class='bg-white/5 p-6 rounded-[2.5rem] border border-white/5 relative overflow-hidden group'>
-            <div class='absolute top-0 left-0 w-1 h-full bg-gold'></div>
-            <p class='text-gold font-black text-[11px] uppercase tracking-widest mb-3 flex items-center gap-2'>
-                <span class='w-5 h-5 rounded-full bg-gold text-black flex items-center justify-center text-[10px]'>1</span> 
-                First Step
-            </p>
-            <p class='text-gray-200 text-sm leading-relaxed'>
-                During First Step, You Have To Make <b class='text-white font-black text-lg'>$50 At Least</b> Then You Will Get <b class='gold-text font-black'>10%</b> Of This Winnings In Game Of Your Choice As A Recharge.
-            </p>
-        </div>
-
-        <!-- Step 2 -->
-        <div class='bg-white/5 p-6 rounded-[2.5rem] border border-white/5 relative overflow-hidden group'>
-            <div class='absolute top-0 left-0 w-1 h-full bg-gold'></div>
-            <p class='text-gold font-black text-[11px] uppercase tracking-widest mb-3 flex items-center gap-2'>
-                <span class='w-5 h-5 rounded-full bg-gold text-black flex items-center justify-center text-[10px]'>2</span> 
-                Second Step
-            </p>
-            <p class='text-gray-200 text-sm leading-relaxed'>
-                During Second Step, Using This Balance You Will Be Able To Win <b class='text-white font-black'>Minimum 4x</b> And <b class='text-white font-black text-lg'>Maximum $50</b> Which Will Be Sent To You In Your <b class='gold-text font-black uppercase tracking-wider'>Cash App</b>.
-            </p>
-        </div>
-    </div>
-
-    <div class='mt-10 text-center'>
-        <p class='luxury-font gold-text italic font-black text-xl tracking-[4px] animate-pulse'>Good Luck!</p>
-    </div>
-                        </div>
-                       </div>`
+            cashout: `<div class='bg-white/5 p-5 rounded-[2rem] mb-6 border border-gold/30 text-center'><p class='font-black text-gold uppercase tracking-widest text-[10px] mb-1'>Minimum Deposit</p><p class='text-white text-3xl font-black italic'>$10.00</p></div><div class='space-y-4 text-left'><p>1. $10-$19: Max $80<br>2. $20-$50: Max 6X<br>3. $50-$2500: Min 4X | Max 6X</p></div>`,
+            freeplay: `<div class='space-y-6 text-left'><div class='bg-white/5 p-6 rounded-[2.5rem] border border-white/5 border-l-4 border-gold'><p class='text-gold font-black text-[11px] mb-2 uppercase'>Step 1</p><p>Win min $50 from freeplay for 10% recharge.</p></div><div class='bg-white/5 p-6 rounded-[2.5rem] border border-white/5 border-l-4 border-gold'><p class='text-gold font-black text-[11px] mb-2 uppercase'>Step 2</p><p>Using recharge, win min 4x (Max $50 payout).</p></div></div>`
         };
 
-        function showPolicy(type) {
-            document.getElementById('policy-title').innerText = type.toUpperCase() + " RULES";
-            document.getElementById('policy-content').innerHTML = policies[type];
-            document.getElementById('policy-modal').style.display = 'flex';
-        }
+        function showPolicy(type) { document.getElementById('policy-title').innerText = type.toUpperCase() + " RULES"; document.getElementById('policy-content').innerHTML = policies[type]; document.getElementById('policy-modal').style.display = 'flex'; }
         function closePolicy() { document.getElementById('policy-modal').style.display = 'none'; }
-        
-        function showLogin() { document.getElementById('login-modal').style.display = 'flex'; }
-        function closeLogin() { document.getElementById('login-modal').style.display = 'none'; }
-        function verifyAdmin() {
-            if(document.getElementById('admin-pass-field').value === MASTER_KEY) {
-                closeLogin(); alert("Master Console Active! (Functionality coming in next update)");
-            } else alert("Access Denied.");
-        }
+        function startJackpot() { let jp = 24982.45; setInterval(() => { jp += Math.random() * 0.5; document.getElementById('jackpot').innerText = "$" + jp.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); }, 150); }
     </script>
 </body>
 </html>
